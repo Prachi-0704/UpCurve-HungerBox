@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class HungerBoxBackendApplication {
 
 	public static void main(String[] args) {
-		System.out.println("Hello");
+		System.out.println("trial Branch");
 		SpringApplication.run(HungerBoxBackendApplication.class, args);
 	}
 
