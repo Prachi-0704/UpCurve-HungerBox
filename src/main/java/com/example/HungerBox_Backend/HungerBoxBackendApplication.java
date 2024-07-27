@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class HungerBoxBackendApplication {
 
 	public static void main(String[] args) {
+		System.out.println("Hello");
 		SpringApplication.run(HungerBoxBackendApplication.class, args);
 	}
 
