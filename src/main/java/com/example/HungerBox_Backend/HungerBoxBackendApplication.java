@@ -18,5 +18,4 @@ public class HungerBoxBackendApplication {
 		System.out.println("trial Branch");
 		SpringApplication.run(HungerBoxBackendApplication.class, args);
 	}
-
 }
