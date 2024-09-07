@@ -17,5 +17,5 @@ public interface FoodService {
 
     public Food findFoodById(long foodId) throws Exception;
 
-    public Food updateAvailabilityStatus(long foodId) throws Exception;
+    public void updateFoodDetails(Long id, String name, Integer price, String description);
 }

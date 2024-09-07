@@ -49,14 +49,15 @@
 
 package com.example.HungerBox_Backend.Model;
 
-import com.example.HungerBox_Backend.DTO.VendorDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,6 +84,11 @@ public class User {
     private int role = 0;
 
     @JsonIgnore
+    @ToString.Exclude
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "customer")
     private List<Order> userOrders = new ArrayList<>();
+
+    // New fields for login date tracking
+    private LocalDate previousLoginDate;
+    private LocalDate currentLoginDate;
 }

@@ -19,6 +19,8 @@ public class CreateFoodRequest {
 
     private boolean isVeg;
 
+    private long totalAvailability;
+
     private boolean isNonVeg;
 
     private long calories;

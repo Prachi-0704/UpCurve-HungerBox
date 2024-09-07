@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -34,6 +35,8 @@ public class Vendor {
 
     private String openingHours;
 
+    @JsonIgnore
+    @ToString.Exclude
     @OneToMany(mappedBy = "vendor", cascade = CascadeType.ALL, orphanRemoval = true) //"vendor" attribute is in Order Entity Class
     private List<Order> vendorOrders = new ArrayList<>();
 
@@ -46,6 +49,7 @@ public class Vendor {
     private boolean open;
 
     @JsonIgnore
+    @ToString.Exclude
     // when the Vendor is deleted from the DB, all it's food items will also get deleted
     @OneToMany(mappedBy = "vendor", cascade = CascadeType.ALL)
     private List<Food> foods = new ArrayList<>();

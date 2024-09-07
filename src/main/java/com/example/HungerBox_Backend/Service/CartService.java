@@ -9,11 +9,11 @@ public interface CartService {
 
     public CartItem updateCartItemQuantity(long cartItemId, int quantity) throws Exception;
 
-    public Cart removeItemFromCart(long cartItemId, String jwt) throws Exception;
-
     public long calculateCartTotal(Cart cart) throws Exception;
 
     public Cart findCartByUserId(long userId) throws Exception;
 
     public Cart clearCart(String jwt) throws Exception;
+
+    public Cart deleteCartItem(long cartItemId, String jwt) throws Exception;
 }

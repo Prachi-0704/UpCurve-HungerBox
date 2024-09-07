@@ -10,12 +10,14 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class OrderServiceImplementation implements OrderService{
 
+    // Injecting required repositories and services
     @Autowired
     private OrderRepository orderRepository;
 
@@ -28,103 +30,75 @@ public class OrderServiceImplementation implements OrderService{
     @Autowired
     private CartService cartService;
 
-    @Override
-    public Order createOrder(OrderRequest request, User user) throws Exception{
-
-        Vendor vendor = vendorService.findVendorById(request.getVendorId());
-
-        Order newOrder = new Order();
-
-        newOrder.setCustomer(user);
-
-        newOrder.setCreatedAt(LocalDateTime.now());
-
-        newOrder.setOrderStatus("PENDING");
-
-        newOrder.setVendor(vendor);
-
-        Cart cart = cartService.findCartByUserId(user.getUserId());
-
-        List<OrderItem> orderItems = new ArrayList<>();
-
-        for(CartItem cartItem : cart.getItems()){
-
-            OrderItem orderItem = new OrderItem();
-
-            orderItem.setFood(cartItem.getFood());
-
-            orderItem.setQuantity(cartItem.getQuantity());
-
-            orderItem.setTotalPrice(cartItem.getTotalPrice());
-
-            OrderItem savedOrderItem = orderItemRepository.save(orderItem);
-
-            orderItems.add(savedOrderItem);
-        }
-
-        newOrder.setItems(orderItems);
-
-        long totalPrice = cartService.calculateCartTotal(cart);
-
-        newOrder.setTotalPrice(totalPrice);
-
-        Order savedOrder = orderRepository.save(newOrder);
-
-        vendor.getVendorOrders().add(savedOrder);
-
-        return savedOrder;
-    }
-
+    /**
+     * Updates the status of an order based on the provided order ID.
+     * Valid statuses include "COMPLETED", "PENDING", and "TAKEN".
+     *
+     * @param orderId The ID of the order to update
+     * @param orderStatus The new status to set for the order
+     * @return The updated order
+     * @throws Exception If the order is not found or the status is invalid
+     */
     @Override
     public Order updateOrderStatus(long orderId, String orderStatus) throws Exception {
 
+        // Find the order by its ID
         Order order = findOrderByOrderId(orderId);
 
-        if(orderStatus.equals("COMPLETED") || orderStatus.equals("PENDING") || orderStatus.equals("TAKEN"))
-        {
+        // Update the order status if it is valid
+        if(orderStatus.equals("COMPLETED") || orderStatus.equals("PENDING") || orderStatus.equals("TAKEN")) {
             order.setOrderStatus(orderStatus);
+            orderRepository.save(order);
             return order;
         }
 
+        // Throw an exception if the provided status is invalid
         throw new Exception("Please select a valid order status");
     }
 
-    @Override
-    public void cancelOrder(long orderId) throws Exception {
-
-        Order order = findOrderByOrderId(orderId);
-
-        orderRepository.delete(order);
-    }
-
-    @Override
-    public List<Order> getUsersOrder(long userId) throws Exception {
-        return orderRepository.findByCustomerUserId(userId);
-    }
-
+    /**
+     * Retrieves all orders placed with a specific vendor.
+     * Optionally filters orders by their status.
+     *
+     * @param vendorId The ID of the vendor
+     * @param orderStatus The status to filter orders by (optional)
+     * @return A list of orders matching the vendor and status criteria
+     * @throws Exception If an error occurs during retrieval
+     */
     @Override
     public List<Order> getVendorsOrder(long vendorId, String orderStatus) throws Exception {
 
-        List<Order> orders = orderRepository.findByVendorVendorId(vendorId);
+        // Fetch the list of orders placed with the vendor
+        List<Order> orders = orderRepository.findOrdersByVendorId(vendorId);
+        System.out.println(orders);
 
-        if(orderStatus!=null){
-            orders = orders.stream().filter(order ->
-                    order.getOrderStatus().equals(orderStatus)).collect(Collectors.toList());
+        // If no status is provided, return all orders
+        if (orderStatus == null || orderStatus.isEmpty()) {
+            return orders;
+        } else {
+            // Otherwise, filter the orders by the provided status
+            orders = orders.stream()
+                    .filter(order -> order.getOrderStatus() != null && order.getOrderStatus().equals(orderStatus))
+                    .collect(Collectors.toList());
         }
 
         return orders;
     }
 
+    /**
+     * Finds and returns an order based on its ID.
+     *
+     * @param orderId The ID of the order to retrieve
+     * @return The retrieved order
+     * @throws Exception If the order is not found
+     */
     @Override
     public Order findOrderByOrderId(long orderId) throws Exception {
 
+        // Retrieve the order from the repository
         Optional<Order> optionalOrder = orderRepository.findById(orderId);
 
-        if(optionalOrder.isEmpty()){
-            throw new Exception("Order not found");
-        }
-
+        // Return the found order or throw an exception if not found
         return optionalOrder.get();
     }
-
 }
